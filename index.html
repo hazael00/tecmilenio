@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- CSP: permite cargar el video del avatar desde nextnowmedia.com -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' https://nextnowmedia.com; img-src 'self' data: https://nextnowmedia.com; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self';">
+  <title>Hotel Guadalajara Express · Andy (Flow)</title>
+  <style>
+    :root{
+      --bg:#ffffff; --surface:#ffffff; --elev:#f2f2f7; --border:#e5e5ea;
+      --text:#1c1c1e; --muted:#6c6c70; --accent:#0a84ff; --accent-press:#0060df;
+      --radius:12px; --shadow:0 8px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,system-ui}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.8);backdrop-filter:saturate(1.8) blur(14px);border-bottom:1px solid var(--border)}
+    .bar{max-width:1240px;margin:0 auto;display:flex;gap:16px;align-items:center;padding:12px 16px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0a84ff,#66b3ff);box-shadow:0 2px 8px rgba(10,132,255,.35)}
+    .title{font-weight:700;letter-spacing:.2px}
+    .tag{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 10px}
+    .quick{flex:1;display:flex;gap:10px}
+    input[type="text"], textarea{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);outline:none}
+    input::placeholder, textarea::placeholder{color:#9a9aa0}
+    .btn{cursor:pointer;border:1px solid var(--border);border-radius:10px;padding:10px 14px;background:#fff;color:var(--text);font-weight:600}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary:active{background:var(--accent-press)}
+    main{max-width:1240px;margin:22px auto;padding:0 16px;display:grid;grid-template-columns:420px 1fr;gap:22px}
+    .device{background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:14px}
+    .device video{display:block;width:100%;aspect-ratio:9/16;border-radius:16px;background:#000}
+    .caption{margin-top:10px;font-size:13px;color:var(--muted);text-align:center}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:640px}
+    .agent{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .avatar{width:36px;height:36px;border-radius:50%;background:url('./public/andysup.png') center/cover no-repeat}
+    .agent .name{font-weight:700}
+    .agent .status{font-size:12px;color:var(--muted)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--elev)}
+    .action{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:14px;cursor:pointer}
+    .messages{flex:1;overflow:auto;padding:16px}
+    .msg{max-width:72%;margin:8px 0;padding:10px 12px;border-radius:14px;border:1px solid var(--border)}
+    .msg small{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+    .msg.andy{background:#f7f8fa}
+    .msg.user{background:var(--accent);border-color:var(--accent);color:#fff;margin-left:auto}
+    .typing{display:inline-flex;gap:4px;align-items:center}
+    .dot{width:6px;height:6px;border-radius:50%;background:#b8bcc6;animation:blink 1.2s infinite}
+    .dot:nth-child(2){animation-delay:.2s}
+    .dot:nth-child(3){animation-delay:.4s}
+    @keyframes blink{0%,60%,100%{opacity:.2}30%{opacity:1}}
+    .composer{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--border);background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
+    .composer textarea{flex:1;min-height:44px;max-height:120px;resize:vertical}
+    .chiprow{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px}
+    .chip{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:12px;color:#4a4a4f;cursor:pointer}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media (max-width: 980px){ main{grid-template-columns:1fr} .device{order:2} .panel{order:1} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">Hotel Guadalajara Express</div>
+          <div class="tag">Asistente · Andy (Flow)</div>
+        </div>
+      </div>
+      <form class="quick" onsubmit="handleTopAsk(event)">
+        <input id="topAsk" type="text" placeholder="Pregunta rápida (ej. Wi‑Fi, check‑in, factura)…" aria-label="Pregunta rápida a Andy">
+        <button class="btn primary" type="submit">Preguntar</button>
+      </form>
+      <button class="btn" onclick="window.location.href='tel:+523355550000'">Llamar</button>
+      <button class="btn" onclick="window.location.href='https://wa.me/523355550001'">WhatsApp</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="device" aria-label="Avatar Andy en video">
+      <video id="heroVideo" autoplay loop muted playsinline poster="./public/andysup.png" aria-describedby="vidcap">
+        <source src="https://nextnowmedia.com/avatarh.mp4" type="video/mp4" />
+        Tu navegador no soporta video HTML5.
+      </video>
+      <div id="vidcap" class="caption">Andy, tu asistente 24/7</div>
+    </section>
+
+    <aside class="panel" aria-label="Chat con Andy">
+      <div class="agent">
+        <div class="avatar" aria-hidden="true"></div>
+        <div>
+          <div class="name">Andy</div>
+          <div class="status">En línea · tiempo de respuesta &lt; 5s</div>
+        </div>
+      </div>
+
+      <div class="actions" role="navigation" aria-label="Acciones rápidas">
+        <button class="action" onclick="quick('checkin')">🪪 Check‑in</button>
+        <button class="action" onclick="quick('wifi')">📶 Wi‑Fi</button>
+        <button class="action" onclick="quick('ubicacion')">🧭 Ubicación</button>
+        <button class="action" onclick="quick('horarios')">🕒 Horarios</button>
+        <button class="action" onclick="quick('factura')">🧾 Factura</button>
+        <button class="action" onclick="quick('reservas')">🏨 Reservas</button>
+      </div>
+
+      <div id="messages" class="messages">
+        <div class="msg andy"><small>Andy</small>Hola, soy <strong>Andy</strong>. ¿En qué puedo ayudarte hoy?</div>
+      </div>
+
+      <div class="chiprow" id="chips"></div>
+
+      <form class="composer" onsubmit="handleChat(event)">
+        <label class="sr-only" for="chatInput">Escribe tu mensaje</label>
+        <textarea id="chatInput" placeholder="Escribe tu mensaje…"></textarea>
+        <button class="btn primary" type="submit">Enviar</button>
+      </form>
+    </aside>
+  </main>
+
+  <script>
+    // ===== Contexto del hotel =====
+    const HOTEL_CONTEXT = {
+      name: "Hotel Guadalajara Express Tonalá",
+      address: "Av. Tonalá 123, Tonalá, Jalisco, México",
+      phone: "+52 33 5555 0000",
+      whatsapp: "+52 33 5555 0001",
+      checkin: "15:00",
+      checkout: "12:00",
+      wifi: { ssid: "Express-Guest", password: "VivaTlaquepaque" },
+      policies: [
+        "No fumar en habitaciones (cargo por limpieza si aplica)",
+        "Mascotas con cargo (incluye camita y limpieza extra)",
+        "Desayuno buffet 7:00–11:00"
+      ],
+      amenities: ["Kiosco de check‑in","Estacionamiento","Restaurante","Wi‑Fi de alta velocidad"]
+    };
+
+    // ===== UI helpers =====
+    const messagesEl = document.getElementById('messages');
+    const chatInput  = document.getElementById('chatInput');
+    const topAsk     = document.getElementById('topAsk');
+
+    function bubble(role, html, cls='andy'){
+      const div=document.createElement('div');
+      div.className=`msg ${cls}`;
+      div.innerHTML = `<small>${role}</small>${html}`;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+      return div;
+    }
+    function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+    function typing(){
+      const d=document.createElement('div');
+      d.className='msg andy';
+      d.innerHTML='<small>Andy</small><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
+      messagesEl.appendChild(d);
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+      return d;
+    }
+
+    // ===== Canned fallbacks =====
+    const CANNED = {
+      wifi: `Wi‑Fi del hotel: <strong>${HOTEL_CONTEXT.wifi.ssid}</strong><br>Contraseña: <strong>${HOTEL_CONTEXT.wifi.password}</strong>`,
+      checkin: `Check‑in a partir de <strong>${HOTEL_CONTEXT.checkin}</strong>. Si ya estás en el lobby, puedo acelerar el proceso en el kiosco (1 minuto).`,
+      ubicacion: `Estamos en <strong>${HOTEL_CONTEXT.address}</strong>. ¿Quieres abrir Maps?`,
+      horarios: `Desayuno buffet <strong>7:00–11:00</strong> · Check‑out <strong>${HOTEL_CONTEXT.checkout}</strong> · Recepción 24/7.`,
+      factura: `Con gusto. Comparte RFC, razón social y correo. Te enviaré el enlace de facturación.`,
+      reservas: `¿Buscas nueva reserva o confirmar una existente? Si es nueva, te ofrezco nuestra mejor tarifa directa ahora mismo.`,
+      saludo: `¡Hola! Soy Andy. Puedo ayudarte con Wi‑Fi, check‑in, facturas, reservas y más.`,
+      cargo: `Veo un cargo de $395 por una película rentada a las 3:45 a.m. Si no fuiste tú, levanto reporte y te confirmo en 15 min.`
+    };
+
+    // ===== Router simple =====
+    function route(text){
+      const s=text.toLowerCase();
+      if(s.includes('wifi')||s.includes('wi-fi')||s.includes('wi fi')) return 'wifi';
+      if(s.includes('check')) return 'checkin';
+      if(s.includes('ubic')||s.includes('direccion')||s.includes('dirección')) return 'ubicacion';
+      if(s.includes('horario')||s.includes('desayuno')||s.includes('buffet')) return 'horarios';
+      if(s.includes('factur')) return 'factura';
+      if(s.includes('reserva')) return 'reservas';
+      if(s.includes('cargo')||s.includes('cobr')) return 'cargo';
+      return 'saludo';
+    }
+
+    // ===== LLM backend =====
+    async function llmReply(userText){
+      try{
+        const r = await fetch('/api/chat',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ message:userText, context:HOTEL_CONTEXT })
+        });
+        if(!r.ok) throw new Error('LLM error');
+        const data = await r.json();
+        return (data.reply||'').trim();
+      }catch(e){ console.warn('LLM fallback', e); return null; }
+    }
+
+    // ===== Responder flujo =====
+    async function respond(text){
+      bubble('Tú', text, 'user');
+      const t = typing();
+      await sleep(320 + Math.random()*480);
+      const llm = await llmReply(text);
+      t.remove();
+      if(llm){ bubble('Andy', llm, 'andy'); }
+      else{ const key=route(text); bubble('Andy', CANNED[key]||CANNED.saludo, 'andy'); }
+    }
+
+    // ===== Eventos =====
+    function handleChat(e){ e.preventDefault(); const v=chatInput.value.trim(); if(!v) return; chatInput.value=''; respond(v); }
+    function handleTopAsk(e){ e.preventDefault(); const v=topAsk.value.trim(); if(!v) return; topAsk.value=''; respond(v); }
+
+    // Chips de ejemplo
+    const chipsEl = document.getElementById('chips');
+    ['¿Cuál es la contraseña del Wi‑Fi?','Mi reservación no aparece','¿Puedo hacer check‑in antes?','Necesito factura'].forEach(t=>{
+      const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=t; b.onclick=()=>{ chatInput.value=t; chatInput.focus(); }; chipsEl.appendChild(b);
+    });
+
+    // Acciones rápidas
+    function quick(key){ respond(key); }
+
+    // Manejo del video: mostrar controles si falla
+    (function(){
+      const hv = document.getElementById('heroVideo');
+      if(!hv) return;
+      const fail = ()=>{ hv.controls = true; };
+      hv.addEventListener('error', fail);
+      setTimeout(()=>{ if(hv.readyState < 2){ fail(); } }, 2000);
+    })();
+  </script>
+</body>
+</html>

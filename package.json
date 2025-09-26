@@ -1,0 +1,13 @@
+{
+  "name": "flow-andy-demo",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@google/generative-ai": "0.16.0"
+  }
+}
